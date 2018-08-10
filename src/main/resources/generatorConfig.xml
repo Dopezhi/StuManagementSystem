@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <!--&lt;!&ndash;导入属性配置&ndash;&gt;-->
+
+    <classPathEntry location="F:/mysql-connector-java-5.1.38.jar" ></classPathEntry>
+    <!--导入属性配置-->
+    <!--<properties resource="datasource.properties"></properties>-->
+
+    <!--指定特定数据库的jdbc驱动jar包的位置-->
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+        <!-- 设置这个属性后，我们就可以用Mybatis逆向工程生成没有注释的javabean -->
+        <commentGenerator>
+            <property name="suppressAllComments" value="true" />
+        </commentGenerator>
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/stu_system"
+                        userId="root"
+                        password="123456">
+        </jdbcConnection>
+
+        <javaTypeResolver >
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+        <!--指定javabean生成的位置-->
+        <javaModelGenerator targetPackage="per.stusystem.pojo" targetProject="./src/main/java">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+        <!--指定Mapper的生成位置-->
+        <sqlMapGenerator targetPackage="mapper"  targetProject="./src/main/resources">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+        <!--指定dao接口的生成位置-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="per.stusystem.dao"  targetProject="./src/main/java">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+        <!--表的映射-->
+        <table  tableName="tbl_stu" domainObjectName="Student" ></table>
+        <table  tableName="tbl_grade" domainObjectName="Grade" ></table>
+
+    </context>
+</generatorConfiguration>

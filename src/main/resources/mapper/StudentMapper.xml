@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="per.stusystem.dao.StudentMapper" >
+  <resultMap id="BaseResultMap" type="per.stusystem.pojo.Student" >
+    <id column="stu_id" property="stuId" jdbcType="INTEGER" />
+    <result column="stu_name" property="stuName" jdbcType="VARCHAR" />
+    <result column="stu_pwd" property="stuPwd" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="stu_gender" property="stuGender" jdbcType="VARCHAR" />
+    <result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+    <result column="stu_idf" property="stuIdf" jdbcType="VARCHAR" />
+  </resultMap>
+  <!--添加一个专属于查询学生所属班级的SQL语句返回结果-->
+  <!--用到了联合查询 用到了association结点-->
+  <resultMap id="WithGradeResultMap" type="per.stusystem.pojo.Student" >
+    <id column="stu_id" property="stuId" jdbcType="INTEGER" />
+    <result column="stu_name" property="stuName" jdbcType="VARCHAR" />
+    <result column="stu_pwd" property="stuPwd" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="stu_gender" property="stuGender" jdbcType="VARCHAR" />
+    <result column="grade_id" property="gradeId" jdbcType="INTEGER" />
+    <result column="stu_idf" property="stuIdf" jdbcType="VARCHAR" />
+    <association property="grade" javaType="per.stusystem.pojo.Grade">
+      <id column="grade_id" property="gradeId"></id>
+      <result column="grade_name" property="gradeName"></result>
+    </association>
+  </resultMap>
+
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    stu_id, stu_name, stu_pwd, email, stu_gender, grade_id, stu_idf
+  </sql>
+  <sql id="WithGrade_Column_List" >
+    s.stu_id, s.stu_name, s.stu_pwd, s.email, s.stu_gender, s.grade_id, s.stu_idf,g.grade_id,g.grade_name
+  </sql>
+
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="per.stusystem.pojo.StudentExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tbl_stu
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_stu
+    where stu_id = #{stuId,jdbcType=INTEGER}
+  </select>
+  <!--添加带有返回学生班级信息的查询-->
+  <select id="selectByExampleWithGrade" resultMap="WithGradeResultMap" parameterType="per.stusystem.pojo.StudentExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="WithGrade_Column_List" />
+    from tbl_stu s
+    left join tbl_grade g on s.grade_id=g.grade_id
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+
+  <select id="selectByPrimaryKeyWithGrade" resultMap="WithGradeResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="WithGrade_Column_List" />
+    from tbl_stu s
+    left join tbl_grade g on s.grade_id=g.grade_id
+    where stu_id = #{stuId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tbl_stu
+    where stu_id = #{stuId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="per.stusystem.pojo.StudentExample" >
+    delete from tbl_stu
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="per.stusystem.pojo.Student" >
+    insert into tbl_stu (stu_id, stu_name, stu_pwd, 
+      email, stu_gender, grade_id, 
+      stu_idf)
+    values (#{stuId,jdbcType=INTEGER}, #{stuName,jdbcType=VARCHAR}, #{stuPwd,jdbcType=VARCHAR}, 
+      #{email,jdbcType=VARCHAR}, #{stuGender,jdbcType=VARCHAR}, #{gradeId,jdbcType=INTEGER}, 
+      #{stuIdf,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="per.stusystem.pojo.Student" >
+    insert into tbl_stu
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="stuId != null" >
+        stu_id,
+      </if>
+      <if test="stuName != null" >
+        stu_name,
+      </if>
+      <if test="stuPwd != null" >
+        stu_pwd,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="stuGender != null" >
+        stu_gender,
+      </if>
+      <if test="gradeId != null" >
+        grade_id,
+      </if>
+      <if test="stuIdf != null" >
+        stu_idf,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="stuId != null" >
+        #{stuId,jdbcType=INTEGER},
+      </if>
+      <if test="stuName != null" >
+        #{stuName,jdbcType=VARCHAR},
+      </if>
+      <if test="stuPwd != null" >
+        #{stuPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="stuGender != null" >
+        #{stuGender,jdbcType=VARCHAR},
+      </if>
+      <if test="gradeId != null" >
+        #{gradeId,jdbcType=INTEGER},
+      </if>
+      <if test="stuIdf != null" >
+        #{stuIdf,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="per.stusystem.pojo.StudentExample" resultType="java.lang.Integer" >
+    select count(*) from tbl_stu
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+    <select id="selectByPrimaryKeyGetNum" resultType="java.lang.Integer">
+      select count(*)+1
+      from tbl_stu
+      where
+      <![CDATA[stu_id< #{stuId,jdbcType=INTEGER}]]>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map" >
+    update tbl_stu
+    <set >
+      <if test="record.stuId != null" >
+        stu_id = #{record.stuId,jdbcType=INTEGER},
+      </if>
+      <if test="record.stuName != null" >
+        stu_name = #{record.stuName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stuPwd != null" >
+        stu_pwd = #{record.stuPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="record.email != null" >
+        email = #{record.email,jdbcType=VARCHAR},
+      </if>
+      <if test="record.stuGender != null" >
+        stu_gender = #{record.stuGender,jdbcType=VARCHAR},
+      </if>
+      <if test="record.gradeId != null" >
+        grade_id = #{record.gradeId,jdbcType=INTEGER},
+      </if>
+      <if test="record.stuIdf != null" >
+        stu_idf = #{record.stuIdf,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update tbl_stu
+    set stu_id = #{record.stuId,jdbcType=INTEGER},
+      stu_name = #{record.stuName,jdbcType=VARCHAR},
+      stu_pwd = #{record.stuPwd,jdbcType=VARCHAR},
+      email = #{record.email,jdbcType=VARCHAR},
+      stu_gender = #{record.stuGender,jdbcType=VARCHAR},
+      grade_id = #{record.gradeId,jdbcType=INTEGER},
+      stu_idf = #{record.stuIdf,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="per.stusystem.pojo.Student" >
+    update tbl_stu
+    <set >
+      <if test="stuName != null" >
+        stu_name = #{stuName,jdbcType=VARCHAR},
+      </if>
+      <if test="stuPwd != null" >
+        stu_pwd = #{stuPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="stuGender != null" >
+        stu_gender = #{stuGender,jdbcType=VARCHAR},
+      </if>
+      <if test="gradeId != null" >
+        grade_id = #{gradeId,jdbcType=INTEGER},
+      </if>
+      <if test="stuIdf != null" >
+        stu_idf = #{stuIdf,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where stu_id = #{stuId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="per.stusystem.pojo.Student" >
+    update tbl_stu
+    set stu_name = #{stuName,jdbcType=VARCHAR},
+      stu_pwd = #{stuPwd,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      stu_gender = #{stuGender,jdbcType=VARCHAR},
+      grade_id = #{gradeId,jdbcType=INTEGER},
+      stu_idf = #{stuIdf,jdbcType=VARCHAR}
+    where stu_id = #{stuId,jdbcType=INTEGER}
+  </update>
+</mapper>
